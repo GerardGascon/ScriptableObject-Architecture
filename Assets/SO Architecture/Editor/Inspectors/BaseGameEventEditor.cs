@@ -4,7 +4,7 @@ namespace ScriptableObjectArchitecture.Editor
 {
     public abstract class BaseGameEventEditor : UnityEditor.Editor
     {
-        private IStackTraceObject Target { get { return (IStackTraceObject)target; } }
+        private IStackTraceObject Target => (IStackTraceObject)target;
 
         private StackTrace _stackTrace;
 

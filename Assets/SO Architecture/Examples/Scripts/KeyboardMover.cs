@@ -10,16 +10,16 @@ namespace ScriptableObjectArchitecture.Examples
         private void Update()
         {
             if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
-                transform.position += Vector3.up * _moveSpeed.Value;
+                transform.position += Vector3.up * _moveSpeed.Value * Time.deltaTime;
 
             if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
-                transform.position += Vector3.down * _moveSpeed.Value;
+                transform.position += Vector3.down * _moveSpeed.Value * Time.deltaTime;
 
             if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
-                transform.position += Vector3.right * _moveSpeed.Value;
+                transform.position += Vector3.right * _moveSpeed.Value * Time.deltaTime;
 
             if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
-                transform.position += Vector3.left * _moveSpeed.Value;
+                transform.position += Vector3.left * _moveSpeed.Value * Time.deltaTime;
         }
     }
 }

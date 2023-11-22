@@ -2,14 +2,12 @@
 using UnityEditor;
 using UnityEditor.AnimatedValues;
 
-namespace ScriptableObjectArchitecture.Editor
-{
+namespace ScriptableObjectArchitecture.Editor {
     [CustomEditor(typeof(BaseVariable<>), true)]
-    public class BaseVariableEditor : UnityEditor.Editor
-    {
-        private BaseVariable Target { get { return (BaseVariable)target; } }
-        protected bool IsClampable { get { return Target.Clampable; } }
-        protected bool IsClamped { get { return Target.IsClamped; } }
+    public class BaseVariableEditor : UnityEditor.Editor {
+        private BaseVariable Target => (BaseVariable)target;
+
+        protected bool IsClampable => Target.Clampable;
 
         private SerializedProperty _valueProperty;
         private SerializedProperty _readOnly;
@@ -17,37 +15,36 @@ namespace ScriptableObjectArchitecture.Editor
         private SerializedProperty _isClamped;
         private SerializedProperty _minValueProperty;
         private SerializedProperty _maxValueProperty;
-        private SerializedProperty _defaultValueProperty;
-        private SerializedProperty _useDefaultProperty;
+        private SerializedProperty _revertProperty;
 
-        private AnimBool _useDefaultValueAnimation;
         private AnimBool _raiseWarningAnimation;
         private AnimBool _isClampedVariableAnimation;
-        
-        private const string READONLY_TOOLTIP = "Should this value be changable during runtime? Will still be editable in the inspector regardless";
 
-        protected virtual void OnEnable()
-        {
+        private StackTrace _stackTrace;
+
+        private const string READONLY_TOOLTIP =
+            "Should this value be changable during runtime? Will still be editable in the inspector regardless";
+
+        protected virtual void OnEnable() {
             _valueProperty = serializedObject.FindProperty("_value");
             _readOnly = serializedObject.FindProperty("_readOnly");
             _raiseWarning = serializedObject.FindProperty("_raiseWarning");
             _isClamped = serializedObject.FindProperty("_isClamped");
             _minValueProperty = serializedObject.FindProperty("_minClampedValue");
             _maxValueProperty = serializedObject.FindProperty("_maxClampedValue");
-            _defaultValueProperty = serializedObject.FindProperty("_defaultValue");
-            _useDefaultProperty = serializedObject.FindProperty("_useDefaultValue");
-
-            _useDefaultValueAnimation = new AnimBool(_useDefaultProperty.boolValue);
-            _useDefaultValueAnimation.valueChanged.AddListener(Repaint);
+            _revertProperty = serializedObject.FindProperty("_revert");
 
             _raiseWarningAnimation = new AnimBool(_readOnly.boolValue);
             _raiseWarningAnimation.valueChanged.AddListener(Repaint);
 
             _isClampedVariableAnimation = new AnimBool(_isClamped.boolValue);
             _isClampedVariableAnimation.valueChanged.AddListener(Repaint);
+
+            _stackTrace = new StackTrace((IStackTraceObject)target);
+            _stackTrace.OnRepaint.AddListener(Repaint);
         }
-        public override void OnInspectorGUI()
-        {
+
+        public override void OnInspectorGUI() {
             serializedObject.Update();
 
             DrawValue();
@@ -56,76 +53,45 @@ namespace ScriptableObjectArchitecture.Editor
 
             DrawClampedFields();
             DrawReadonlyField();
-        }
-        protected virtual void DrawValue()
-        {
-            GenericPropertyDrawer.DrawPropertyDrawerLayout(_valueProperty, Target.Type);
+            EditorGUILayout.PropertyField(_revertProperty);
 
-            EditorGUILayout.PropertyField(_useDefaultProperty);
-            _useDefaultValueAnimation.target = _useDefaultProperty.boolValue;
-            using (var anim = new EditorGUILayout.FadeGroupScope(_useDefaultValueAnimation.faded))
-            {
-                if (anim.visible)
-                {
-                    using (new EditorGUI.IndentLevelScope())
-                    {
-                        GenericPropertyDrawer.DrawPropertyDrawerLayout(_defaultValueProperty, Target.ReferenceType);
-                    }
-                }
-            }
+            serializedObject.ApplyModifiedProperties();
+
+            if (!SOArchitecturePreferences.IsDebugEnabled)
+                EditorGUILayout.HelpBox("Debug mode disabled\nStack traces will not be filed on raise!", MessageType.Warning);
+
+            _stackTrace.Draw();
         }
-        protected void DrawClampedFields()
-        {
+
+        void DrawValue() {
+            GenericPropertyDrawer.DrawPropertyDrawerLayout(_valueProperty, Target.Type);
+        }
+
+        void DrawClampedFields() {
             if (!IsClampable)
                 return;
 
             EditorGUILayout.PropertyField(_isClamped);
             _isClampedVariableAnimation.target = _isClamped.boolValue;
 
-            using (var anim = new EditorGUILayout.FadeGroupScope(_isClampedVariableAnimation.faded))
-            {
-                if(anim.visible)
-                {
-                    using (new EditorGUI.IndentLevelScope())
-                    {
-                        EditorGUILayout.PropertyField(_minValueProperty);
-                        EditorGUILayout.PropertyField(_maxValueProperty);
-                    }
-                }                
+            using EditorGUILayout.FadeGroupScope anim = new(_isClampedVariableAnimation.faded);
+            if (!anim.visible) return;
+            using (new EditorGUI.IndentLevelScope()) {
+                EditorGUILayout.PropertyField(_minValueProperty);
+                EditorGUILayout.PropertyField(_maxValueProperty);
             }
-            
         }
-        protected void DrawReadonlyField()
-        {
-            if (_isClamped.boolValue)
-                return;
 
+        protected void DrawReadonlyField() {
             EditorGUILayout.PropertyField(_readOnly, new GUIContent("Read Only", READONLY_TOOLTIP));
 
             _raiseWarningAnimation.target = _readOnly.boolValue;
-            using (var fadeGroup = new EditorGUILayout.FadeGroupScope(_raiseWarningAnimation.faded))
-            {
-                if (fadeGroup.visible)
-                {
-                    EditorGUI.indentLevel++;
-                    EditorGUILayout.PropertyField(_raiseWarning);
-                    EditorGUI.indentLevel--;
-                }
-            }
-        }
-    }
-    [CustomEditor(typeof(BaseVariable<,>), true)]
-    public class BaseVariableWithEventEditor : BaseVariableEditor
-    {
-        public override void OnInspectorGUI()
-        {
-            base.OnInspectorGUI();
 
-            EditorGUILayout.Space();
-
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("_event"));
-
-            serializedObject.ApplyModifiedProperties();
+            using EditorGUILayout.FadeGroupScope fadeGroup = new(_raiseWarningAnimation.faded);
+            if (!fadeGroup.visible) return;
+            EditorGUI.indentLevel++;
+            EditorGUILayout.PropertyField(_raiseWarning);
+            EditorGUI.indentLevel--;
         }
     }
 }

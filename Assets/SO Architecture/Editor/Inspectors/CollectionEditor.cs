@@ -7,11 +7,9 @@ namespace ScriptableObjectArchitecture.Editor
     [CustomEditor(typeof(BaseCollection), true)]
     public class CollectionEditor : UnityEditor.Editor
     {
-        private BaseCollection Target { get { return (BaseCollection)target; } }
-        private SerializedProperty CollectionItemsProperty
-        {
-            get { return serializedObject.FindProperty(LIST_PROPERTY_NAME);}
-        }
+        private BaseCollection Target => (BaseCollection)target;
+
+        private SerializedProperty CollectionItemsProperty => serializedObject.FindProperty(LIST_PROPERTY_NAME);
 
         private ReorderableList _reorderableList;
 

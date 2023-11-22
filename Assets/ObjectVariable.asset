@@ -9,17 +9,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f9377ffeb64ba30478a995a8ffc78ae8, type: 3}
-  m_Name: Player Move Speed
+  m_Script: {fileID: 11500000, guid: d74bacc6470d5f64cbb226a9325213db, type: 3}
+  m_Name: ObjectVariable
   m_EditorClassIdentifier: 
-  _value: 5
+  _value: {fileID: 0}
   _readOnly: 0
   _useDefaultValue: 0
   _raiseWarning: 1
   _isClamped: 0
-  _minClampedValue: 0
-  _maxClampedValue: 0
-  _defaultValue: 0
+  _minClampedValue: {fileID: 0}
+  _maxClampedValue: {fileID: 0}
+  _defaultValue: {fileID: 0}
   _event:
     m_PersistentCalls:
       m_Calls: []

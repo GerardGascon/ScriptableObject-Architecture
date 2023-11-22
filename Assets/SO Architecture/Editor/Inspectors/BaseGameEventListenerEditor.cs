@@ -5,7 +5,7 @@ namespace ScriptableObjectArchitecture.Editor
 {
     public abstract class BaseGameEventListenerEditor : UnityEditor.Editor
     {
-        private IStackTraceObject Target { get { return (IStackTraceObject)target; } }
+        private IStackTraceObject Target => (IStackTraceObject)target;
 
         private StackTrace _stackTrace;
         private SerializedProperty _event;
@@ -69,5 +69,5 @@ namespace ScriptableObjectArchitecture.Editor
 
             EditorGUILayout.Space();
         }
-    } 
+    }
 }
