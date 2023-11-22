@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace ScriptableObjectArchitecture {
     public abstract class GameEventBase<T> : GameEventBase, IGameEvent<T> {
-        private readonly List<IGameEventListener<T>> _typedListeners = new();
         private readonly List<System.Action<T>> _typedActions = new();
 
 #if UNITY_EDITOR
@@ -13,27 +12,11 @@ namespace ScriptableObjectArchitecture {
         public void Raise(T value) {
             AddStackTrace(value);
 
-            for (int i = _typedListeners.Count - 1; i >= 0; i--)
-                _typedListeners[i].OnEventRaised(value);
-
-            for (int i = _listeners.Count - 1; i >= 0; i--)
-                _listeners[i].OnEventRaised();
-
             for (int i = _typedActions.Count - 1; i >= 0; i--)
                 _typedActions[i](value);
 
             for (int i = _actions.Count - 1; i >= 0; i--)
                 _actions[i]();
-        }
-
-        public void AddListener(IGameEventListener<T> listener) {
-            if (!_typedListeners.Contains(listener))
-                _typedListeners.Add(listener);
-        }
-
-        public void RemoveListener(IGameEventListener<T> listener) {
-            if (_typedListeners.Contains(listener))
-                _typedListeners.Remove(listener);
         }
 
         public void AddListener(System.Action<T> action) {
@@ -46,13 +29,17 @@ namespace ScriptableObjectArchitecture {
                 _typedActions.Remove(action);
         }
 
+        public override void RemoveAll() {
+            base.RemoveAll();
+            _typedActions.RemoveRange(0, _typedActions.Count);
+        }
+
         public override string ToString() {
             return "GameEventBase<" + typeof(T) + ">";
         }
     }
 
     public abstract class GameEventBase : SOArchitectureBaseObject, IGameEvent, IStackTraceObject {
-        protected readonly List<IGameEventListener> _listeners = new List<IGameEventListener>();
         protected readonly List<System.Action> _actions = new List<System.Action>();
 
         public List<StackTraceEntry> StackTraces => _stackTraces;
@@ -76,21 +63,8 @@ namespace ScriptableObjectArchitecture {
         public virtual void Raise() {
             AddStackTrace();
 
-            for (int i = _listeners.Count - 1; i >= 0; i--)
-                _listeners[i].OnEventRaised();
-
             for (int i = _actions.Count - 1; i >= 0; i--)
                 _actions[i]();
-        }
-
-        public void AddListener(IGameEventListener listener) {
-            if (!_listeners.Contains(listener))
-                _listeners.Add(listener);
-        }
-
-        public void RemoveListener(IGameEventListener listener) {
-            if (_listeners.Contains(listener))
-                _listeners.Remove(listener);
         }
 
         public void AddListener(System.Action action) {
@@ -104,7 +78,6 @@ namespace ScriptableObjectArchitecture {
         }
 
         public virtual void RemoveAll() {
-            _listeners.RemoveRange(0, _listeners.Count);
             _actions.RemoveRange(0, _actions.Count);
         }
     }

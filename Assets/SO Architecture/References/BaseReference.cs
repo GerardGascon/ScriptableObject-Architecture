@@ -65,16 +65,6 @@ namespace ScriptableObjectArchitecture
 
             return copy;
         }
-        public void AddListener(IGameEventListener listener)
-        {
-            if (_variable != null)
-                _variable.AddListener(listener);
-        }
-        public void RemoveListener(IGameEventListener listener)
-        {
-            if (_variable != null)
-                _variable.RemoveListener(listener);
-        }
         public void AddListener(System.Action action)
         {
             if (_variable != null)
@@ -92,5 +82,5 @@ namespace ScriptableObjectArchitecture
     }
 
     //Can't get property drawer to work with generic arguments
-    public abstract class BaseReference { } 
+    public abstract class BaseReference { }
 }
