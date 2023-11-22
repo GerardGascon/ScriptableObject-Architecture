@@ -30,10 +30,6 @@ Custom icons
 
 ![](https://i.imgur.com/simB0mK.png)
 
-Easy and automatic script generation
-
-![](https://i.imgur.com/xm2gNmo.png)
-
 # Installation
 For a more detailed explanation, please read the [Quick Start Page](https://github.com/DanielEverland/ScriptableObject-Architecture/wiki/Quick-Start)
 
