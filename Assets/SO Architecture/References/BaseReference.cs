@@ -1,82 +1,60 @@
 ﻿using UnityEngine;
 
-namespace ScriptableObjectArchitecture
-{
+namespace ScriptableObjectArchitecture {
     [System.Serializable]
-    public class BaseReference<TBase, TVariable> : BaseReference where TVariable : BaseVariable<TBase>
-    {
+    public class BaseReference<TBase, TVariable> : BaseReference where TVariable : BaseVariable<TBase> {
         public BaseReference() { }
-        public BaseReference(TBase baseValue)
-        {
+
+        public BaseReference(TBase baseValue) {
             _useConstant = true;
             _constantValue = baseValue;
         }
 
-        [SerializeField]
-        protected bool _useConstant = false;
-        [SerializeField]
-        protected TBase _constantValue = default(TBase);
-        [SerializeField]
-        protected TVariable _variable = default(TVariable);
+        [SerializeField] protected bool _useConstant = false;
+        [SerializeField] protected TBase _constantValue = default(TBase);
+        [SerializeField] protected TVariable _variable = default(TVariable);
 
-        public TVariable Variable
-        {
+        public TVariable Variable {
             get => _variable;
-            set
-            {
+            set {
                 _useConstant = false;
                 _variable = value;
             }
         }
 
-        public TBase Value
-        {
-            get
-            {
-                return (_useConstant || _variable == null) ? _constantValue : _variable.Value;
-            }
-            set
-            {
-                if (!_useConstant && _variable != null)
-                {
+        public TBase Value {
+            get => (_useConstant || _variable == null) ? _constantValue : _variable.Value;
+            set {
+                if (!_useConstant && _variable != null) {
                     _variable.Value = value;
-                }
-                else
-                {
+                } else {
                     _useConstant = true;
                     _constantValue = value;
                 }
             }
         }
-        public bool IsValueDefined
-        {
-            get
-            {
-                return _useConstant || _variable != null;
-            }
-        }
 
-        public BaseReference CreateCopy()
-        {
-            BaseReference<TBase, TVariable> copy = (BaseReference<TBase, TVariable>)System.Activator.CreateInstance(GetType());
+        public BaseReference CreateCopy() {
+            BaseReference<TBase, TVariable> copy =
+                (BaseReference<TBase, TVariable>)System.Activator.CreateInstance(GetType());
             copy._useConstant = _useConstant;
             copy._constantValue = _constantValue;
             copy._variable = _variable;
 
             return copy;
         }
-        public void AddListener(System.Action action)
-        {
+
+        public void AddListener(System.Action action) {
             if (_variable != null)
                 _variable.AddListener(action);
         }
-        public void RemoveListener(System.Action action)
-        {
+
+        public void RemoveListener(System.Action action) {
             if (_variable != null)
                 _variable.RemoveListener(action);
         }
-        public override string ToString()
-        {
+
+        public override string ToString() {
             return Value.ToString();
         }
     }
