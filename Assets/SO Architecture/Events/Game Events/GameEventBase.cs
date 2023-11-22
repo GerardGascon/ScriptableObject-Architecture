@@ -10,7 +10,9 @@ namespace ScriptableObjectArchitecture {
 #endif
 
         public void Raise(T value) {
+#if UNITY_EDITOR
             AddStackTrace(value);
+#endif
 
             for (int i = _typedActions.Count - 1; i >= 0; i--)
                 _typedActions[i](value);
@@ -42,26 +44,28 @@ namespace ScriptableObjectArchitecture {
     public abstract class GameEventBase : SOArchitectureBaseObject, IGameEvent, IStackTraceObject {
         protected readonly List<System.Action> _actions = new List<System.Action>();
 
+#if UNITY_EDITOR
         public List<StackTraceEntry> StackTraces => _stackTraces;
 
         private List<StackTraceEntry> _stackTraces = new List<StackTraceEntry>();
+#endif
 
-        public void AddStackTrace() {
 #if UNITY_EDITOR
+        public void AddStackTrace() {
             if (SOArchitecturePreferences.IsDebugEnabled)
                 _stackTraces.Insert(0, StackTraceEntry.Create());
-#endif
         }
 
         public void AddStackTrace(object value) {
-#if UNITY_EDITOR
             if (SOArchitecturePreferences.IsDebugEnabled)
                 _stackTraces.Insert(0, StackTraceEntry.Create(value));
-#endif
         }
+#endif
 
         public virtual void Raise() {
+#if UNITY_EDITOR
             AddStackTrace();
+#endif
 
             for (int i = _actions.Count - 1; i >= 0; i--)
                 _actions[i]();
