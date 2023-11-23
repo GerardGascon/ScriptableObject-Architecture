@@ -20,15 +20,7 @@ namespace ScriptableObjectArchitecture {
             set => _value = SetValue(value);
         }
 
-        public virtual T MinClampValue {
-            get {
-                if (Clampable) {
-                    return _minClampedValue;
-                } else {
-                    return default(T);
-                }
-            }
-        }
+        public virtual T MinClampValue => Clampable ? _minClampedValue : default(T);
 
         protected T MaxClampValue => Clampable ? _maxClampedValue : default;
 

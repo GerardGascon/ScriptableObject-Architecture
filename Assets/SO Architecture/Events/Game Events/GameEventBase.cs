@@ -6,7 +6,7 @@ namespace ScriptableObjectArchitecture {
         private readonly List<System.Action<T>> _typedActions = new();
 
 #if UNITY_EDITOR
-        [SerializeField] protected T _debugValue = default(T);
+        [SerializeField] public T _debugValue = default(T);
 #endif
 
         public void Raise(T value) {
