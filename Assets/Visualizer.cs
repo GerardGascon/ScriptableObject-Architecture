@@ -9,4 +9,5 @@ public class Visualizer : MonoBehaviour {
     [SerializeField] Vector2Reference vector2Variable;
     [SerializeField] Vector3Reference vector3Variable;
     [SerializeField] IntReference intVariable;
+    [SerializeField] StringReference stringVariable;
 }
